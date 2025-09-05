@@ -90,8 +90,8 @@ export const logout = (req, res) => {
     // Clear the JWT cookie
     res.clearCookie('jwt', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict"
+        secure: true,
+        sameSite: "none"
     });
     
     res.status(200).json({ message: "Logout successful" });
