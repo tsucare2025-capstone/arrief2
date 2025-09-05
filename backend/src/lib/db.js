@@ -3,5 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const urlDB = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQL_ROOT_PASSWORD}@${process.env.RAILWAY_PRIVATE_DOMAIN}:3306/${process.env.MYSQL_DATABASE}`;
+// Railway MySQL connection string
+const urlDB = process.env.DATABASE_URL || "mysql://root:qLdgYsjVHfwfckIOkWUgUaTOJPRibKCz@crossover.proxy.rlwy.net:52018/railway";
+
 export const db = mysql.createConnection(urlDB).promise();

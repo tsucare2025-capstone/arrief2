@@ -4,19 +4,13 @@ import mysql from 'mysql2';
 // Load environment variables
 dotenv.config();
 
-console.log('Environment variables loaded:');
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
-console.log('DB_NAME:', process.env.DB_NAME);
+// Railway MySQL connection string
+const urlDB = process.env.DATABASE_URL || "mysql://root:qLdgYsjVHfwfckIOkWUgUaTOJPRibKCz@crossover.proxy.rlwy.net:52018/railway";
 
-// Create connection
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
+console.log('Testing connection to:', urlDB);
+
+// Create connection using URL
+const connection = mysql.createConnection(urlDB);
 
 console.log('Attempting to connect...');
 
