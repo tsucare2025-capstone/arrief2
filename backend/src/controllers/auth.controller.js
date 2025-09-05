@@ -4,8 +4,8 @@ import { generateToken } from "../lib/utils.js";
 import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
-    const { name, email, password } = req.body;
-    console.log("Signup attempt:", { name, email, password: password ? "***" : "missing" });
+    const { name, email, password, profession } = req.body;
+    console.log("Signup attempt:", { name, email, password: password ? "***" : "missing", profession: profession ? "***" : "missing" });
     
     try {
         if (!name || !email || !password) { 
@@ -31,10 +31,10 @@ export const signup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashpassword = await bcrypt.hash(password, salt);
 
-        // Insert new counselor
+        // Insert new counselor with profession field
         console.log("Inserting new counselor...");
-        const query = "INSERT INTO counselor (name, email, password) VALUES (?, ?, ?)";
-        const [newCounselor] = await db.query(query, [name, email, hashpassword]);
+        const query = "INSERT INTO counselor (name, email, password, profession) VALUES (?, ?, ?, ?)";
+        const [newCounselor] = await db.query(query, [name, email, hashpassword, profession || "Counselor"]);
         
         console.log("Insert result:", newCounselor);
         
@@ -48,6 +48,7 @@ export const signup = async (req, res) => {
                 counselorId: newCounselor.insertId,
                 name: name,
                 email: email,
+                profession: profession || "Counselor",
                 token: token,
                 message: "Counselor created successfully"
             });
