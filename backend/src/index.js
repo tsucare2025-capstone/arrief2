@@ -18,6 +18,8 @@ app.use(cors({
         "https://tsucare.netlify.app" // Production frontend
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 }));
 //routes
 app.use("/api/auth", authRoutes);
