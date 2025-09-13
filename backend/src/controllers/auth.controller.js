@@ -33,14 +33,17 @@ export const signup = async (req, res) => {
 
         // Insert new counselor with all required fields
         console.log("Inserting new counselor...");
-        const query = "INSERT INTO counselor (name, email, password, profession, assignedCollege, is_verified) VALUES (?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO counselor (name, email, password, profession, counselorImage, assignedCollege, is_verified, otp, otp_expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         const [newCounselor] = await db.query(query, [
             name, 
             email, 
             hashpassword, 
             profession || "Counselor",
-            "", // assignedCollege (empty string instead of null)
-            0   // is_verified (0 = false)
+            "user-stud.png", // counselorImage (default image)
+            "", // assignedCollege (empty string)
+            0,  // is_verified (0 = false)
+            "", // otp (empty string)
+            new Date() // otp_expiry (current date as default)
         ]);
         
         console.log("Insert result:", newCounselor);
@@ -56,6 +59,7 @@ export const signup = async (req, res) => {
                 name: name,
                 email: email,
                 profession: profession || "Counselor",
+                counselorImage: "user-stud.png",
                 assignedCollege: "",
                 is_verified: false,
                 token: token,
