@@ -4,16 +4,7 @@ import cookieParser from "cookie-parser";
 
 export const protectRoute = async (req, res, next) => {    
     try {
-        // Only use Authorization header for token
-        const authHeader = req.headers.authorization;
-        let token = null;
-        
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            token = authHeader.substring(7);
-        }
-        
-        console.log("Auth middleware - Token found:", !!token);
-        console.log("Auth middleware - Auth header:", req.headers.authorization);
+        const token = req.cookies.jwt;
         
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -35,8 +26,6 @@ export const protectRoute = async (req, res, next) => {
         // Set data for the route handler
         req.counselorId = decoded.id;
         req.counselor = counselors[0];
-        
-        console.log("Auth middleware - User authenticated:", counselors[0].name);
         
         // Call next() ONLY ONCE at the end
         next();

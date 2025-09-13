@@ -31,19 +31,15 @@ export const signup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashpassword = await bcrypt.hash(password, salt);
 
-        // Insert new counselor with all required fields
+        // Insert new counselor with required fields only (nullable fields can be NULL)
         console.log("Inserting new counselor...");
-        const query = "INSERT INTO counselor (name, email, password, profession, counselorImage, assignedCollege, is_verified, otp, otp_expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO counselor (name, email, password, profession, is_verified) VALUES (?, ?, ?, ?, ?)";
         const [newCounselor] = await db.query(query, [
             name, 
             email, 
             hashpassword, 
             profession || "Counselor",
-            "user-stud.png", // counselorImage (default image)
-            "", // assignedCollege (empty string)
-            0,  // is_verified (0 = false)
-            "", // otp (empty string)
-            new Date() // otp_expiry (current date as default)
+            0  // is_verified (0 = false)
         ]);
         
         console.log("Insert result:", newCounselor);
@@ -59,8 +55,8 @@ export const signup = async (req, res) => {
                 name: name,
                 email: email,
                 profession: profession || "Counselor",
-                counselorImage: "user-stud.png",
-                assignedCollege: "",
+                counselorImage: null,
+                assignedCollege: null,
                 is_verified: false,
                 token: token,
                 message: "Counselor created successfully"
@@ -113,11 +109,12 @@ export const login = async (req, res) => {
 }
 
 export const logout = (req, res) => {
-    // Clear the JWT cookie
+    // Clear the JWT cookie with same options as setting
     res.clearCookie('jwt', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none"
+        secure: true,
+        sameSite: "none",
+        path: "/"
     });
     
     res.status(200).json({ message: "Logout successful" });

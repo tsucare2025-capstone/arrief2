@@ -2,11 +2,18 @@ import jwt from "jsonwebtoken";
 
 export const generateToken = (id, res) => {
     const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.cookie("jwt", token, {
+    
+    // Cookie configuration for cross-origin and different browsers
+    const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: "none", // Changed from "strict" to "none" for cross-origin
-    });
+        secure: true, // Always true for production
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        sameSite: "none", // Required for cross-origin requests
+        domain: undefined, // Let browser handle domain
+        path: "/" // Available on all paths
+    };
+    
+    console.log("Setting cookie with options:", cookieOptions);
+    res.cookie("jwt", token, cookieOptions);
     return token;
 }
