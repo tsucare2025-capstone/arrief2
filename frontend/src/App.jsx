@@ -21,20 +21,23 @@ const App = () => {
     checkAuth();
   }, []); // Empty dependency array to prevent infinite loop
 
-  console.log(authUser);
+  console.log('App: authUser =', authUser);
+  console.log('App: isCheckAuth =', isCheckAuth);
+  
   // Show loading spinner while checking auth
   if (isCheckAuth) {
+    console.log('App: Showing loading spinner');
     return (
       <div className='flex justify-center items-center h-screen'>
         <Loader className='animate-spin' />
       </div>
     );
   }
+  
+  console.log('App: Rendering main app with CookieConsent');
 
   return (
-
     <div data-theme="light">
-      
       <Routes>
         <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/login" element={authUser ? <Navigate to="/" /> : 
