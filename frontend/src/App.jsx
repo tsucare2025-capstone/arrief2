@@ -48,7 +48,7 @@ const App = () => {
             <SignupPage />
           </>
         } />
-        <Route path="/messages" element={ <Navigate to="/login" />} />
+        <Route path="/messages" element={<Messages />} />
       </Routes>
       <Toaster />
     </div>
