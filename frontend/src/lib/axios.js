@@ -2,12 +2,12 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
     baseURL: `${process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"}/api`,
-    withCredentials: true,
+    // Removed withCredentials since we're not using cookies
 });
 
 // Add request interceptor to include token in Authorization header
 axiosInstance.interceptors.request.use((config) => {
-    // Get token from localStorage as fallback
+    // Get token from localStorage
     const token = localStorage.getItem('authToken');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;

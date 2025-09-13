@@ -4,18 +4,15 @@ import cookieParser from "cookie-parser";
 
 export const protectRoute = async (req, res, next) => {    
     try {
-        // Try to get token from cookies first, then from Authorization header
-        let token = req.cookies.jwt;
+        // Only use Authorization header for token
+        const authHeader = req.headers.authorization;
+        let token = null;
         
-        if (!token) {
-            const authHeader = req.headers.authorization;
-            if (authHeader && authHeader.startsWith('Bearer ')) {
-                token = authHeader.substring(7);
-            }
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7);
         }
         
         console.log("Auth middleware - Token found:", !!token);
-        console.log("Auth middleware - Cookies:", req.cookies);
         console.log("Auth middleware - Auth header:", req.headers.authorization);
         
         if (!token) {
