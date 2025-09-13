@@ -3,6 +3,7 @@ import { X, Cookie, HelpCircle } from 'lucide-react';
 import CookieInstructions from './CookieInstructions';
 
 const CookieConsent = () => {
+  console.log('CookieConsent component rendered!');
   const [showBanner, setShowBanner] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -31,7 +32,11 @@ const CookieConsent = () => {
     const shouldShow = !consent || !cookiesWorking || isIncognito;
     console.log('CookieConsent: shouldShow =', shouldShow);
     
-    if (shouldShow) {
+    // FOR TESTING: Always show banner in incognito mode
+    if (isIncognito) {
+      console.log('CookieConsent: FORCING banner to show in incognito mode');
+      setShowBanner(true);
+    } else if (shouldShow) {
       setShowBanner(true);
     }
   }, []);
