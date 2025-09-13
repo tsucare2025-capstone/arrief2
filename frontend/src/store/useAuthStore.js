@@ -22,9 +22,26 @@ export const useAuthStore = create((set, get) => ({
             set({ authUser: response.data, isCheckAuth: false });
             get().connectSocket();
         } catch (error) {
-            // Don't show error toast for authentication checks - this is normal for new users
-            // Only log the error for debugging
-            console.log("Auth check failed (this is normal for new users):", error.response?.data?.message);
+            // Check if it's a token issue (cookies blocked)
+            if (error.response?.status === 401) {
+                console.log("Auth check failed - likely cookies blocked:", error.response?.data?.message);
+                
+                // Check if we have a token in localStorage as fallback
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    console.log("Found token in localStorage, trying to restore session");
+                    // Try to restore the session using the token
+                    try {
+                        const response = await axiosInstance.get("/auth/check-auth");
+                        set({ authUser: response.data, isCheckAuth: false });
+                        get().connectSocket();
+                        return;
+                    } catch (retryError) {
+                        console.log("Token restoration failed:", retryError);
+                    }
+                }
+            }
+            
             set({ authUser: null, isCheckAuth: false });
         }
     },

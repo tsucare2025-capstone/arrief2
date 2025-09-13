@@ -9,7 +9,25 @@ const CookieConsent = () => {
   useEffect(() => {
     // Check if user has already made a choice
     const consent = localStorage.getItem('cookieConsent');
-    if (!consent) {
+    
+    // Test if cookies are working by trying to set a test cookie
+    const testCookie = () => {
+      try {
+        document.cookie = "testCookie=test; path=/";
+        const cookiesWorking = document.cookie.includes("testCookie=test");
+        // Clean up test cookie
+        document.cookie = "testCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        return cookiesWorking;
+      } catch (e) {
+        return false;
+      }
+    };
+    
+    const cookiesWorking = testCookie();
+    const isIncognito = !window.indexedDB || navigator.webdriver;
+    
+    // Show banner if no consent OR if cookies aren't working OR if incognito mode
+    if (!consent || !cookiesWorking || isIncognito) {
       setShowBanner(true);
     }
   }, []);
