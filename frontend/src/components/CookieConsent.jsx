@@ -9,25 +9,29 @@ const CookieConsent = () => {
   useEffect(() => {
     // Check if user has already made a choice
     const consent = localStorage.getItem('cookieConsent');
+    console.log('CookieConsent: consent =', consent);
     
-    // Test if cookies are working by trying to set a test cookie
-    const testCookie = () => {
-      try {
-        document.cookie = "testCookie=test; path=/";
-        const cookiesWorking = document.cookie.includes("testCookie=test");
-        // Clean up test cookie
-        document.cookie = "testCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        return cookiesWorking;
-      } catch (e) {
-        return false;
-      }
-    };
+    // Simple incognito detection
+    const isIncognito = !window.indexedDB || navigator.webdriver || window.chrome?.runtime?.onConnect;
+    console.log('CookieConsent: isIncognito =', isIncognito);
     
-    const cookiesWorking = testCookie();
-    const isIncognito = !window.indexedDB || navigator.webdriver;
+    // Test if cookies are working
+    let cookiesWorking = false;
+    try {
+      document.cookie = "testCookie=test; path=/";
+      cookiesWorking = document.cookie.includes("testCookie=test");
+      // Clean up test cookie
+      document.cookie = "testCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    } catch (e) {
+      console.log('CookieConsent: cookie test failed', e);
+    }
+    console.log('CookieConsent: cookiesWorking =', cookiesWorking);
     
     // Show banner if no consent OR if cookies aren't working OR if incognito mode
-    if (!consent || !cookiesWorking || isIncognito) {
+    const shouldShow = !consent || !cookiesWorking || isIncognito;
+    console.log('CookieConsent: shouldShow =', shouldShow);
+    
+    if (shouldShow) {
       setShowBanner(true);
     }
   }, []);
