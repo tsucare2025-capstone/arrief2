@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import Messages from './pages/Messages'
+import CookieConsent from './components/CookieConsent'
 import { useAuthStore } from './store/useAuthStore'
 import { Loader } from "lucide-react";
 import { Navigate } from 'react-router-dom';
@@ -51,6 +52,7 @@ const App = () => {
         <Route path="/messages" element={authUser ? <Messages /> : <Navigate to="/login" />} />
       </Routes>
       <Toaster />
+      <CookieConsent />
     </div>
   )
 }
