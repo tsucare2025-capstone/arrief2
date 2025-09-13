@@ -7,9 +7,18 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: { 
-        origin: "http://localhost:5173",
+        origin: [
+            "http://localhost:5173", // Local development
+            "https://tsucare.netlify.app" // Production frontend
+        ],
+        credentials: true
     }
 })
+
+console.log("Socket.io CORS configured for origins:", [
+    "http://localhost:5173", 
+    "https://tsucare.netlify.app"
+]);
 
 
 // Map to store online users and their sockets

@@ -39,8 +39,8 @@ export const signup = async (req, res) => {
             email, 
             hashpassword, 
             profession || "Counselor",
-            null, // assignedCollege
-            0     // is_verified (0 = false)
+            "", // assignedCollege (empty string instead of null)
+            0   // is_verified (0 = false)
         ]);
         
         console.log("Insert result:", newCounselor);
@@ -56,7 +56,7 @@ export const signup = async (req, res) => {
                 name: name,
                 email: email,
                 profession: profession || "Counselor",
-                assignedCollege: null,
+                assignedCollege: "",
                 is_verified: false,
                 token: token,
                 message: "Counselor created successfully"
