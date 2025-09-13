@@ -12,7 +12,8 @@ dotenv.config();
 //middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
+// CORS configuration
+const corsOptions = {
     origin: [
         "http://localhost:5173", // Local development
         "https://tsucare.netlify.app" // Production frontend
@@ -21,7 +22,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     exposedHeaders: ['Set-Cookie']
-}));
+};
+
+console.log("CORS configured for origins:", corsOptions.origin);
+app.use(cors(corsOptions));
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);

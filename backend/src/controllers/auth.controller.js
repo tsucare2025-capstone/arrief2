@@ -33,13 +33,12 @@ export const signup = async (req, res) => {
 
         // Insert new counselor with all required fields
         console.log("Inserting new counselor...");
-        const query = "INSERT INTO counselor (name, email, password, profession, counselorImage, assignedCollege, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO counselor (name, email, password, profession, assignedCollege, is_verified) VALUES (?, ?, ?, ?, ?, ?)";
         const [newCounselor] = await db.query(query, [
             name, 
             email, 
             hashpassword, 
             profession || "Counselor",
-            null, // counselorImage
             null, // assignedCollege
             0     // is_verified (0 = false)
         ]);
