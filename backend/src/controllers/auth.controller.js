@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
     const { name, email, password, profession } = req.body;
-    console.log("Signup attempt:", { name, email, password: password ? "***" : "missing", profession: profession ? "***" : "missing" });
+    console.log("Signup attempt:", { name, email, password: password ? "***" : "missing", profession });
     
     try {
         if (!name || !email || !password) { 
@@ -31,10 +31,18 @@ export const signup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashpassword = await bcrypt.hash(password, salt);
 
-        // Insert new counselor with profession field
+        // Insert new counselor with all required fields
         console.log("Inserting new counselor...");
-        const query = "INSERT INTO counselor (name, email, password, profession) VALUES (?, ?, ?, ?)";
-        const [newCounselor] = await db.query(query, [name, email, hashpassword, profession || "Counselor"]);
+        const query = "INSERT INTO counselor (name, email, password, profession, counselorImage, assignedCollege, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const [newCounselor] = await db.query(query, [
+            name, 
+            email, 
+            hashpassword, 
+            profession || "Counselor",
+            null, // counselorImage
+            null, // assignedCollege
+            0     // is_verified (0 = false)
+        ]);
         
         console.log("Insert result:", newCounselor);
         
@@ -49,6 +57,8 @@ export const signup = async (req, res) => {
                 name: name,
                 email: email,
                 profession: profession || "Counselor",
+                assignedCollege: null,
+                is_verified: false,
                 token: token,
                 message: "Counselor created successfully"
             });

@@ -15,17 +15,17 @@ export const useAuthStore = create((set, get) => ({
     socket: null,
     
     checkAuth: async () => {
+        set({ isCheckAuth: true });
         try {
             const response = await axiosInstance.get("/auth/check-auth");
-            set({ authUser: response.data});
+            console.log("Auth check response:", response.data);
+            set({ authUser: response.data, isCheckAuth: false });
             get().connectSocket();
         } catch (error) {
             // Don't show error toast for authentication checks - this is normal for new users
             // Only log the error for debugging
             console.log("Auth check failed (this is normal for new users):", error.response?.data?.message);
             set({ authUser: null, isCheckAuth: false });
-        } finally {
-            set({ isCheckAuth: false });
         }
     },
 
