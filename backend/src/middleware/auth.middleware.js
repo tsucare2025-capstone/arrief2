@@ -4,7 +4,18 @@ import cookieParser from "cookie-parser";
 
 export const protectRoute = async (req, res, next) => {    
     try {
-        const token = req.cookies.jwt;
+        // Try to get token from cookies first, then from Authorization header
+        let token = req.cookies.jwt;
+        
+        if (!token) {
+            // Try Authorization header as fallback
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
+        }
+        
+        console.log("Token found:", !!token, "Source:", req.cookies.jwt ? "cookie" : "header");
         
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
