@@ -5,7 +5,6 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import Messages from './pages/Messages'
-import CookieConsent from './components/CookieConsent'
 import { useAuthStore } from './store/useAuthStore'
 import { Loader } from "lucide-react";
 import { Navigate } from 'react-router-dom';
@@ -14,27 +13,19 @@ import { Toaster } from 'react-hot-toast'
 const App = () => {
   const { authUser, checkAuth, isCheckAuth, onlineUsers } = useAuthStore();
 
-  console.log({onlineUsers});
-
   useEffect(() => {
     // Check auth status on mount - only run once
     checkAuth();
   }, []); // Empty dependency array to prevent infinite loop
-
-  console.log('App: authUser =', authUser);
-  console.log('App: isCheckAuth =', isCheckAuth);
   
   // Show loading spinner while checking auth
   if (isCheckAuth) {
-    console.log('App: Showing loading spinner');
     return (
       <div className='flex justify-center items-center h-screen'>
         <Loader className='animate-spin' />
       </div>
     );
   }
-  
-  console.log('App: Rendering main app with CookieConsent');
 
   return (
     <div data-theme="light">
@@ -55,7 +46,6 @@ const App = () => {
         <Route path="/messages" element={authUser ? <Messages /> : <Navigate to="/login" />} />
       </Routes>
       <Toaster />
-      <CookieConsent />
     </div>
   )
 }

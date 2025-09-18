@@ -5,11 +5,9 @@ import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
     const { name, email, password, profession } = req.body;
-    console.log("Signup attempt:", { name, email, password: password ? "***" : "missing", profession });
     
     try {
         if (!name || !email || !password) { 
-            console.log("Missing fields:", { name: !!name, email: !!email, password: !!password });
             return res.status(400).json({ message: "All fields are required" });
         }
         if (password.length < 6) {
@@ -20,19 +18,15 @@ export const signup = async (req, res) => {
         }
 
         // Check if counselor already exists
-        console.log("Checking if counselor exists...");
         const [existingCounselor] = await db.query("SELECT * FROM counselor WHERE email = ?", [email]);
         if (existingCounselor.length > 0) {
-            console.log("Counselor already exists");
             return res.status(400).json({ message: "Counselor already exists" });
         }
 
-        console.log("Hashing password...");
         const salt = await bcrypt.genSalt(10);
         const hashpassword = await bcrypt.hash(password, salt);
 
         // Insert new counselor with required fields only (nullable fields can be NULL)
-        console.log("Inserting new counselor...");
         const query = "INSERT INTO counselor (name, email, password, profession, is_verified) VALUES (?, ?, ?, ?, ?)";
         const [newCounselor] = await db.query(query, [
             name, 
@@ -42,14 +36,9 @@ export const signup = async (req, res) => {
             0  // is_verified (0 = false)
         ]);
         
-        console.log("Insert result:", newCounselor);
-        
         if (newCounselor.insertId) {
             // Generate token
-            console.log("Generating token...");
             const token = generateToken(newCounselor.insertId, res);
-            
-            console.log("Signup successful");
             res.status(201).json({
                 counselorId: newCounselor.insertId,
                 name: name,
@@ -63,7 +52,6 @@ export const signup = async (req, res) => {
             });
         }
         else {
-            console.log("Failed to create counselor - no insertId");
             res.status(400).json({ message: "Failed to create counselor" });
         }
     } catch (error) {

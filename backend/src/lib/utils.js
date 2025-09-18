@@ -13,7 +13,6 @@ export const generateToken = (id, res) => {
         path: "/" // Available on all paths
     };
     
-    console.log("Setting cookie with options:", cookieOptions);
     res.cookie("jwt", token, cookieOptions);
     return token;
 }

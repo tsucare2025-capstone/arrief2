@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+
+const Notifications = () => {
+  // Mock data - replace with actual data from API
+  const notifications = [
+    {
+      id: 1,
+      type: 'upcoming',
+      icon: 'fas fa-bell',
+      message: 'Your next session with Student is in 30 minutes.',
+      highlight: 'Student'
+    },
+    {
+      id: 2,
+      type: 'confirmed',
+      icon: 'fas fa-bell',
+      message: 'Your session with Student has been confirmed for March 29, 2025 at 3:30 pm.',
+      highlight: 'Student'
+    },
+    {
+      id: 3,
+      type: 'urgent',
+      icon: 'fas fa-exclamation-triangle',
+      message: 'Student has reported severe distress. Immediate attention may be needed.',
+      highlight: 'Student'
+    },
+    {
+      id: 4,
+      type: 'message',
+      icon: 'user-stud.png',
+      message: 'Student sent you a message. Tap to respond.',
+      highlight: 'Student'
+    },
+    {
+      id: 5,
+      type: 'feedback',
+      icon: 'user-stud.png',
+      message: 'Student has submitted feedback on their last session. Tap to review.',
+      highlight: 'Student'
+    }
+  ];
+
+  const getNotificationStyle = (type) => {
+    const baseStyle = {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '15px 20px',
+      borderRadius: '10px',
+      marginBottom: '10px',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    };
+
+    switch (type) {
+      case 'upcoming':
+        return {
+          ...baseStyle,
+          backgroundColor: '#fff3cd',
+          borderLeft: '4px solid #ffc107'
+        };
+      case 'confirmed':
+        return {
+          ...baseStyle,
+          backgroundColor: '#d4edda',
+          borderLeft: '4px solid #28a745'
+        };
+      case 'urgent':
+        return {
+          ...baseStyle,
+          backgroundColor: '#f8d7da',
+          borderLeft: '4px solid #dc3545'
+        };
+      case 'message':
+        return {
+          ...baseStyle,
+          backgroundColor: '#d1ecf1',
+          borderLeft: '4px solid #17a2b8'
+        };
+      case 'feedback':
+        return {
+          ...baseStyle,
+          backgroundColor: '#e2e3e5',
+          borderLeft: '4px solid #6c757d'
+        };
+      default:
+        return baseStyle;
+    }
+  };
+
+  return (
+    <div className="container" style={{ display: 'flex', width: '100%', height: '100vh' }}>
+      {/* Sidebar */}
+      <div className="sidebar" style={{ width: '220px', backgroundColor: '#6a040f', color: 'white', padding: '20px 0', height: '100%' }}>
+        <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px', marginBottom: '30px' }}>
+          <img src="/logo.png" alt="TSU Logo" style={{ width: '80px', height: 'auto', display: 'block', margin: '0 auto' }} />
+        </div>
+        <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          <li style={{ marginBottom: '10px' }}>
+            <a href="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
+            </a>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <a href="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
+            </a>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <a href="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
+            </a>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <a href="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
+            </a>
+          </li>
+          <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+            <a href="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
+            </a>
+          </li>
+          <li style={{ marginBottom: '10px' }}>
+            <a href="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
+            </a>
+          </li>
+          <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <a href="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+              <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Notifications Container */}
+      <div className="notifications-container" style={{ flex: 1, backgroundColor: '#fff', margin: '20px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', display: 'flex', flexDirection: 'column' }}>
+        <div className="notifications-header" style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+          <h2 style={{ color: '#6a040f', margin: 0, fontSize: '24px', textAlign: 'center' }}>NOTIFICATIONS</h2>
+        </div>
+        
+        <div className="notifications-list" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px', overflowY: 'auto', flex: 1 }}>
+          {notifications.map((notification) => (
+            <div 
+              key={notification.id} 
+              className={`notification-item ${notification.type}`}
+              style={getNotificationStyle(notification.type)}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateX(5px)';
+                e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateX(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <div className="notification-icon" style={{ marginRight: '15px', flexShrink: 0 }}>
+                {notification.icon.startsWith('fas') ? (
+                  <i className={notification.icon} style={{ fontSize: '20px', color: '#6a040f' }}></i>
+                ) : (
+                  <img 
+                    src={`/${notification.icon}`} 
+                    alt="Notification" 
+                    style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                )}
+              </div>
+              <div className="notification-content" style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#333', lineHeight: '1.4' }}>
+                  {notification.message.split(notification.highlight).map((part, index) => (
+                    <React.Fragment key={index}>
+                      {part}
+                      {index < notification.message.split(notification.highlight).length - 1 && (
+                        <span className="highlight" style={{ fontWeight: 'bold', color: '#6a040f' }}>
+                          {notification.highlight}
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Notifications;

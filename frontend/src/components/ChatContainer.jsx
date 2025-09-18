@@ -15,12 +15,9 @@ const ChatContainer = () => {
     
     // Call getMessages if we have a valid selectedUser with a valid _id (can be string or number)
     if (selectedUser && selectedUser._id && (typeof selectedUser._id === 'string' || typeof selectedUser._id === 'number')) {
-      console.log('Fetching messages for user:', selectedUser._id);
       getMessages(selectedUser._id);
       subscribeToNewMessage();
       return () => unsubscribeFromNewMessage();
-    } else {
-      console.log('Invalid selectedUser or _id, not fetching messages:', selectedUser);
     }
   }, [selectedUser, getMessages]);
 

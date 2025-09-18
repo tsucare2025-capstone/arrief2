@@ -24,7 +24,6 @@ const corsOptions = {
     exposedHeaders: ['Set-Cookie']
 };
 
-console.log("CORS configured for origins:", corsOptions.origin);
 app.use(cors(corsOptions));
 //routes
 app.use("/api/auth", authRoutes);
