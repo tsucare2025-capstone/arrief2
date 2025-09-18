@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StudentProfiles = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [collegeFilter, setCollegeFilter] = useState('');
+  const navigate = useNavigate();
 
   // Mock data - replace with actual data from API
   const students = [
@@ -56,39 +58,39 @@ const StudentProfiles = () => {
         </div>
         <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           <li style={{ marginBottom: '10px' }}>
-            <a href="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
-            </a>
+            </Link>
           </li>
           <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <a href="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
-            </a>
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <a href="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
-            </a>
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <a href="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
-            </a>
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <a href="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
-            </a>
+            </Link>
           </li>
           <li style={{ marginBottom: '10px' }}>
-            <a href="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
-            </a>
+            </Link>
           </li>
           <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <a href="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+            <Link to="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
               <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
@@ -97,11 +99,11 @@ const StudentProfiles = () => {
       <div className="main-content" style={{ flex: 1, padding: '30px', backgroundColor: 'rgb(255, 255, 255)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', borderRadius: '20px' }}>
         {/* Search Section */}
         <div className="search-section" style={{ marginBottom: '30px' }}>
-          <div className="back-button" style={{ marginBottom: '20px' }}>
-            <a href="/" style={{ color: '#666', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-              <i className="fas fa-arrow-left" style={{ marginRight: '5px' }}></i>
-            </a>
-          </div>
+        <div className="back-button" style={{ marginBottom: '20px' }}>
+          <Link to="/" style={{ color: '#666', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <i className="fas fa-arrow-left" style={{ marginRight: '5px' }}></i>
+          </Link>
+        </div>
           <div className="search-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="search-box" style={{ position: 'relative', maxWidth: '400px' }}>
               <i className="fas fa-search" style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#666' }}></i>
@@ -186,7 +188,7 @@ const StudentProfiles = () => {
             }}
             onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
             onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            onClick={() => window.location.href = '/student-detail'}
+            onClick={() => navigate('/student-detail')}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
                 <img 

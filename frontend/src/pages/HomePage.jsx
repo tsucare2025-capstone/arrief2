@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Grid3X3, Trophy, Mail, Calendar, Bell, History, LogOut } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
 import Messages from './Messages'
-import Calendar from './Calendar'
+import CalendarPage from './Calendar'
 import Notifications from './Notifications'
 import SessionHistory from './SessionHistory'
 import StudentProfiles from './StudentProfiles'
@@ -28,31 +28,31 @@ const HomePage = () => {
             </Link>
           </li>
           <li>
-            <Link to="/StudentProfiles">
+            <Link to="/student-profiles">
               <Trophy size={20} />
               Student Profiles
             </Link>
           </li>
           <li>
-            <Link to="/Messages">
+            <Link to="/messages">
               <Mail size={20} />
               Messages
             </Link>
           </li>
           <li>
-            <Link to="/Calendar">
+            <Link to="/calendar">
               <Calendar size={20} />
               Calendar
             </Link>
           </li>
           <li>
-            <Link to="/Notifications">
+            <Link to="/notifications">
               <Bell size={20} />
               Notifications
             </Link>
           </li>
           <li>
-            <Link to="/SessionHistory">
+            <Link to="/session-history">
               <History size={20} />
               Session History
             </Link>
