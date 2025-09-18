@@ -108,7 +108,7 @@ export const logout = (req, res) => {
     res.status(200).json({ message: "Logout successful" });
 }
 
-export const checkAuth = async (req, res) => {
+export const checkAuth = (req, res) => {
     try {
         // Get the JWT token from cookies
         const token = req.cookies.jwt;
@@ -118,36 +118,17 @@ export const checkAuth = async (req, res) => {
         }
         
         // Verify the JWT token
-        jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
                 return res.status(401).json({ message: "Unauthorized: Invalid token" });
             }
             
-            try {
-                // Get complete counselor data from database
-                const [counselors] = await db.query("SELECT counselorID, name, email, profession, counselorImage, assignedCollege, is_verified FROM counselor WHERE counselorID = ?", [decoded.id]);
-                
-                if (counselors.length === 0) {
-                    return res.status(401).json({ message: "Counselor not found" });
-                }
-                
-                const counselor = counselors[0];
-                
-                // Return complete user info matching login/signup format
-                res.status(200).json({ 
-                    counselorId: counselor.counselorID,
-                    name: counselor.name,
-                    email: counselor.email,
-                    profession: counselor.profession,
-                    counselorImage: counselor.counselorImage,
-                    assignedCollege: counselor.assignedCollege,
-                    is_verified: counselor.is_verified,
-                    message: "Authenticated"
-                });
-            } catch (dbError) {
-                console.error("Database error in checkAuth:", dbError);
-                res.status(500).json({ message: "Internal server error" });
-            }
+            // Token is valid, return user info
+            res.status(200).json({ 
+                message: "Authenticated",
+                counselorId: decoded.id,
+                isAuthenticated: true
+            });
         });
     } catch (error) {
         console.error("Check auth error:", error);
