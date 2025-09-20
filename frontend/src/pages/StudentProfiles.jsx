@@ -1,99 +1,153 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Grid3X3, Trophy, Mail, Calendar, Bell, History, LogOut } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import axiosInstance from '../lib/axios';
 
 const StudentProfiles = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [collegeFilter, setCollegeFilter] = useState('');
-  const navigate = useNavigate();
-
-  // Mock data - replace with actual data from API
-  const students = [
-    {
-      id: 1,
-      name: 'John Doe',
-      program: 'Computer Science',
-      studentNumber: '2024-001234',
-      gender: 'Male',
-      college: 'CCS',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      program: 'Psychology',
-      studentNumber: '2024-001235',
-      gender: 'Female',
-      college: 'CASS',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      program: 'Business Administration',
-      studentNumber: '2024-001236',
-      gender: 'Male',
-      college: 'CBA',
-      profileImage: '/user-stud.png'
-    }
-  ];
-
-  const colleges = ['CAFA', 'CASS', 'CBA', 'CCJE', 'CCS', 'CIT', 'COE', 'COS', 'COED'];
-
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.studentNumber.includes(searchTerm);
-    const matchesGender = !genderFilter || student.gender === genderFilter;
-    const matchesCollege = !collegeFilter || student.college === collegeFilter;
-    
-    return matchesSearch && matchesGender && matchesCollege;
+  const [students, setStudents] = useState([]);
+  const [colleges, setColleges] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalStudents: 0,
+    hasNextPage: false,
+    hasPrevPage: false
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
+  const {authUser, logout} = useAuthStore();
+
+  // Fetch students data
+  const fetchStudents = async (page = 1, search = '', gender = '', college = '') => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10'
+      });
+      
+      if (search) params.append('search', search);
+      if (gender) params.append('gender', gender);
+      if (college) params.append('college', college);
+
+      const response = await axiosInstance.get(`/students?${params}`);
+      setStudents(response.data.students);
+      setPagination(response.data.pagination);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
+  };
+
+  // Fetch colleges for filter dropdown
+  const fetchColleges = async () => {
+    try {
+      const response = await axiosInstance.get('/students/colleges');
+      setColleges(response.data);
+    } catch (error) {
+      console.error('Error fetching colleges:', error);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchStudents();
+    fetchColleges();
+  }, []);
+
+  // Handle search and filter changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setCurrentPage(1);
+      fetchStudents(1, searchTerm, genderFilter, collegeFilter);
+    }, 300); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, genderFilter, collegeFilter]);
+
+  // Handle page changes
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    fetchStudents(newPage, searchTerm, genderFilter, collegeFilter);
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Handle gender filter change
+  const handleGenderChange = (e) => {
+    setGenderFilter(e.target.value);
+  };
+
+  // Handle college filter change
+  const handleCollegeChange = (e) => {
+    setCollegeFilter(e.target.value);
+  };
 
   return (
-    <div className="container" style={{ display: 'flex', width: '100%', height: '100vh' }}>
+   <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="sidebar" style={{ width: '220px', backgroundColor: '#6a040f', color: 'white', padding: '20px 0', height: '100%' }}>
-        <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px', marginBottom: '30px' }}>
-          <img src="/logo.png" alt="TSU Logo" style={{ width: '80px', height: 'auto', display: 'block', margin: '0 auto' }} />
+      <div className="sidebar">
+        <div className="logo">
+          <img src="/logo-counsel.png" alt="TSU Logo" />
         </div>
-        <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ marginBottom: '10px' }}>
-            <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
+        <ul className="nav-links">
+          <li>
+            <Link to="/">
+              <Grid3X3 size={20} />
+              Dashboard
             </Link>
           </li>
-          <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <Link to="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
+          <li className="active">
+            <Link to="/student-profiles">
+              <Trophy size={20} />
+              Student Profiles
             </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <Link to="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
+          <li>
+            <Link to="/messages">
+              <Mail size={20} />
+              Messages
             </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <Link to="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
+          <li>
+            <Link to="/calendar">
+              <Calendar size={20} />
+              Calendar
             </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <Link to="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
+          <li>
+            <Link to="/notifications">
+              <Bell size={20} />
+              Notifications
             </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <Link to="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
+          <li>
+            <Link to="/session-history">
+              <History size={20} />
+              Session History
             </Link>
           </li>
-          <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <Link to="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
-            </Link>
+          <li className="sign-out">
+            {authUser && (
+              <Link 
+                to="/login" 
+                className="text-white hover:text-red-200 transition-colors duration-200" 
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                Logout
+              </Link>
+            )}
           </li>
         </ul>
       </div>
+
+    
 
       {/* Main Content */}
       <div className="main-content" style={{ flex: 1, padding: '30px', backgroundColor: 'rgb(255, 255, 255)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', borderRadius: '20px' }}>
@@ -111,7 +165,7 @@ const StudentProfiles = () => {
                 type="text" 
                 placeholder="Search student..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 style={{ 
                   width: '100%', 
                   padding: '12px 15px 12px 45px', 
@@ -126,7 +180,7 @@ const StudentProfiles = () => {
             <div className="filters" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
               <select 
                 value={genderFilter}
-                onChange={(e) => setGenderFilter(e.target.value)}
+                onChange={handleGenderChange}
                 style={{ 
                   padding: '10px 15px', 
                   border: '2px solid #e0e0e0', 
@@ -142,7 +196,7 @@ const StudentProfiles = () => {
               </select>
               <select 
                 value={collegeFilter}
-                onChange={(e) => setCollegeFilter(e.target.value)}
+                onChange={handleCollegeChange}
                 style={{ 
                   padding: '10px 15px', 
                   border: '2px solid #e0e0e0', 
@@ -177,8 +231,8 @@ const StudentProfiles = () => {
 
         {/* Students Grid */}
         <div className="students-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-          {filteredStudents.map((student) => (
-            <div key={student.id} className="student-card" style={{ 
+          {students.map((student) => (
+            <div key={student.studentID} className="student-card" style={{ 
               backgroundColor: '#f8f9fa', 
               padding: '20px', 
               borderRadius: '10px', 
@@ -188,7 +242,7 @@ const StudentProfiles = () => {
             }}
             onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
             onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            onClick={() => navigate('/student-detail')}
+            onClick={() => navigate(`/student-detail/${student.studentID}`)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
                 <img 
@@ -202,7 +256,7 @@ const StudentProfiles = () => {
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>Student No: {student.studentNumber}</p>
+                <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>Student No: {student.studentNo}</p>
                 <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>Gender: {student.gender}</p>
                 <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>College: {student.college}</p>
               </div>
@@ -210,7 +264,58 @@ const StudentProfiles = () => {
           ))}
         </div>
 
-        {filteredStudents.length === 0 && (
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="pagination" style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: '10px', 
+            marginTop: '30px',
+            padding: '20px 0'
+          }}>
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!pagination.hasPrevPage}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid #ddd',
+                borderRadius: '5px',
+                backgroundColor: pagination.hasPrevPage ? 'white' : '#f5f5f5',
+                color: pagination.hasPrevPage ? '#333' : '#999',
+                cursor: pagination.hasPrevPage ? 'pointer' : 'not-allowed'
+              }}
+            >
+              Previous
+            </button>
+            
+            <span style={{ 
+              padding: '8px 16px',
+              backgroundColor: '#6a040f',
+              color: 'white',
+              borderRadius: '5px'
+            }}>
+              {pagination.currentPage} of {pagination.totalPages}
+            </span>
+            
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!pagination.hasNextPage}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid #ddd',
+                borderRadius: '5px',
+                backgroundColor: pagination.hasNextPage ? 'white' : '#f5f5f5',
+                color: pagination.hasNextPage ? '#333' : '#999',
+                cursor: pagination.hasNextPage ? 'pointer' : 'not-allowed'
+              }}
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {students.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
             <i className="fas fa-user-graduate" style={{ fontSize: '48px', marginBottom: '20px', color: '#ccc' }}></i>
             <p>No students found matching your criteria.</p>

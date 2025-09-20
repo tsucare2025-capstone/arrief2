@@ -51,7 +51,7 @@ const App = () => {
         } />
         <Route path="/messages" element={authUser ? <Messages /> : <Navigate to="/login" />} />
         <Route path="/student-profiles" element={authUser ? <StudentProfiles /> : <Navigate to="/login" />} />
-        <Route path="/student-detail" element={authUser ? <StudentDetail /> : <Navigate to="/login" />} />
+        <Route path="/student-detail/:id" element={authUser ? <StudentDetail /> : <Navigate to="/login" />} />
         <Route path="/session-detail" element={authUser ? <SessionDetail /> : <Navigate to="/login" />} />
         <Route path="/session-history" element={authUser ? <SessionHistory /> : <Navigate to="/login" />} />
         <Route path="/notifications" element={authUser ? <Notifications /> : <Navigate to="/login" />} />

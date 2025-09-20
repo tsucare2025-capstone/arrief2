@@ -1,102 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Grid3X3, Trophy, Mail, Calendar, Bell, History, LogOut } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import axiosInstance from '../lib/axios';
 
 const SessionHistory = () => {
-  const [currentMonth, setCurrentMonth] = useState('March 2025');
+  const {authUser, logout} = useAuthStore();
+  const navigate = useNavigate();
+  
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
+  // Format current month for display
+  const currentMonth = currentDate.toLocaleDateString('en-US', { 
+    month: 'long', 
+    year: 'numeric' 
+  });
 
-  // Mock data - replace with actual data from API
-  const sessions = [
-    {
-      id: 1,
-      studentName: 'Student',
-      date: '03 March',
-      status: 'resolved',
-      feedback: 'I truly appreciate the support I received. The counselor was very understanding...',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 2,
-      studentName: 'Student',
-      date: '11 March',
-      status: 'resolved',
-      feedback: 'Talking to my counselor felt like a safe space where I could be honest about...',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 3,
-      studentName: 'Student',
-      date: '18 March',
-      status: 'resolved',
-      feedback: 'No feedback yet',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 4,
-      studentName: 'Student',
-      date: '20 March',
-      status: 'resolved',
-      feedback: 'This has been one of the best counseling experiences I\'ve had. My counselor...',
-      profileImage: '/user-stud.png'
-    },
-    {
-      id: 5,
-      studentName: 'Student',
-      date: '23 March',
-      status: 'cancelled',
-      feedback: null,
-      profileImage: '/user-stud.png'
-    }
-  ];
+  // Fetch sessions data
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setLoading(true);
+        const month = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
+        const year = currentDate.getFullYear();
+        
+        const response = await axiosInstance.get(`/students/sessions/history?month=${month}&year=${year}`);
+        setSessions(response.data);
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+        setError('Failed to load session history');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, [currentDate]);
 
   const handlePreviousMonth = () => {
-    // Logic to go to previous month
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
   };
 
   const handleNextMonth = () => {
-    // Logic to go to next month
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  };
+
+  const handleSessionClick = (studentID) => {
+    navigate(`/student-detail/${studentID}`);
   };
 
   return (
-    <div className="container" style={{ display: 'flex', width: '100%', height: '100vh' }}>
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="sidebar" style={{ width: '220px', backgroundColor: '#6a040f', color: 'white', padding: '20px 0', height: '100%' }}>
-        <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px', marginBottom: '30px' }}>
-          <img src="/logo.png" alt="TSU Logo" style={{ width: '80px', height: 'auto', display: 'block', margin: '0 auto' }} />
+      <div className="sidebar">
+        <div className="logo">
+          <img src="/logo-counsel.png" alt="TSU Logo" />
         </div>
-        <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
-            </a>
+        <ul className="nav-links">
+          <li>
+            <Link to="/">
+              <Grid3X3 size={20} />
+              Dashboard
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
-            </a>
+          <li>
+            <Link to="/student-profiles">
+              <Trophy size={20} />
+              Student Profiles
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
-            </a>
+          <li>
+            <Link to="/messages">
+              <Mail size={20} />
+              Messages
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
-            </a>
+          <li>
+            <Link to="/calendar">
+              <Calendar size={20} />
+              Calendar
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
-            </a>
+          <li>
+            <Link to="/notifications">
+              <Bell size={20} />
+              Notifications
+            </Link>
           </li>
-          <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <a href="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
-            </a>
+          <li className="active">
+            <Link to="/session-history">
+              <History size={20} />
+              Session History
+            </Link>
           </li>
-          <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <a href="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
-            </a>
+          <li className="sign-out">
+            {authUser && (
+              <Link 
+                to="/login" 
+                className="text-white hover:text-red-200 transition-colors duration-200" 
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                Logout
+              </Link>
+            )}
           </li>
         </ul>
       </div>
@@ -115,10 +133,11 @@ const SessionHistory = () => {
                 padding: '10px 15px', 
                 borderRadius: '5px', 
                 cursor: 'pointer',
-                fontSize: '16px'
+                fontSize: '16px',
+                fontWeight: 'bold'
               }}
             >
-              <i className="fas fa-chevron-left"></i>
+              &lt;
             </button>
             <h2 style={{ margin: 0, fontSize: '24px', color: '#333' }}>{currentMonth}</h2>
             <button 
@@ -131,59 +150,114 @@ const SessionHistory = () => {
                 padding: '10px 15px', 
                 borderRadius: '5px', 
                 cursor: 'pointer',
-                fontSize: '16px'
+                fontSize: '16px',
+                fontWeight: 'bold'
               }}
             >
-              <i className="fas fa-chevron-right"></i>
+              &gt;
             </button>
           </div>
         </div>
         
         <div className="session-list" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px', overflowY: 'auto', flex: 1 }}>
-          {sessions.map((session) => (
-            <div key={session.id} className="session-item" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              backgroundColor: '#f8f9fa', 
-              padding: '20px', 
-              borderRadius: '10px', 
-              gap: '20px',
-              boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)'
-            }}>
-              <div className="session-profile" style={{ flexShrink: 0 }}>
-                <img 
-                  src={session.profileImage} 
-                  alt="Student" 
-                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-              </div>
-              <div className="session-details" style={{ flex: 1 }}>
-                <div className="session-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <h3 style={{ margin: 0, fontSize: '18px', color: '#333' }}>{session.studentName}</h3>
-                  <span className="session-date" style={{ fontSize: '14px', color: '#666' }}>{session.date}</span>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+              <div style={{ fontSize: '18px' }}>Loading sessions...</div>
+            </div>
+          ) : error ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#dc3545' }}>
+              <div style={{ fontSize: '18px', marginBottom: '20px' }}>{error}</div>
+              <button 
+                onClick={() => window.location.reload()}
+                style={{ 
+                  backgroundColor: '#6a040f', 
+                  color: 'white', 
+                  border: 'none', 
+                  padding: '10px 20px', 
+                  borderRadius: '5px', 
+                  cursor: 'pointer' 
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : sessions.length > 0 ? (
+            sessions.map((session) => (
+              <div 
+                key={session.sessionID} 
+                className="session-item" 
+                onClick={() => handleSessionClick(session.studentID)}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  backgroundColor: '#f8f9fa', 
+                  padding: '20px', 
+                  borderRadius: '10px', 
+                  gap: '15px',
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+                }}
+              >
+                <div className="session-profile" style={{ flexShrink: 0, marginTop: '5px' }}>
+                  <div style={{ 
+                    width: '40px', 
+                    height: '40px', 
+                    borderRadius: '50%', 
+                    backgroundColor: '#e9ecef',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #333'
+                  }}>
+                    <i className="fas fa-user" style={{ fontSize: '16px', color: '#333' }}></i>
+                  </div>
                 </div>
-                <div className={`session-status ${session.status}`} style={{ 
-                  marginBottom: '10px',
-                  padding: '4px 8px', 
-                  borderRadius: '4px', 
-                  fontSize: '12px', 
-                  fontWeight: 'bold',
-                  display: 'inline-block',
-                  backgroundColor: session.status === 'resolved' ? '#d4edda' : '#f8d7da',
-                  color: session.status === 'resolved' ? '#155724' : '#721c24'
-                }}>
-                  {session.status === 'resolved' ? 'Resolved' : 'Cancelled'}
-                </div>
-                {session.feedback && (
-                  <div className="session-feedback" style={{ marginTop: '10px' }}>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#666', fontStyle: 'italic' }}>
-                      "{session.feedback}"
+                <div className="session-details" style={{ flex: 1 }}>
+                  <div className="session-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', color: '#ff6b35', fontWeight: 'bold' }}>{session.studentName}</h3>
+                    <span className="session-date" style={{ fontSize: '14px', color: '#666' }}>{session.date}</span>
+                  </div>
+                  <div className={`session-status ${session.status}`} style={{ 
+                    marginBottom: '8px',
+                    padding: '2px 6px', 
+                    borderRadius: '4px', 
+                    fontSize: '12px', 
+                    fontWeight: 'bold',
+                    display: 'inline-block',
+                    backgroundColor: session.status === 'Resolved' ? '#d4edda' : '#f8d7da',
+                    color: session.status === 'Resolved' ? '#155724' : '#721c24'
+                  }}>
+                    {session.status === 'Resolved' ? 'Resolved' : 'Cancelled'}
+                  </div>
+                  <div className="session-feedback" style={{ marginTop: '5px' }}>
+                    <p style={{ 
+                      margin: 0, 
+                      fontSize: '14px', 
+                      color: '#666', 
+                      fontStyle: session.feedback && session.feedback !== 'No feedback yet' ? 'italic' : 'normal',
+                      lineHeight: '1.4'
+                    }}>
+                      {session.feedback ? `"${session.feedback}"` : 'No feedback yet'}
                     </p>
                   </div>
-                )}
+                </div>
               </div>
+            ))
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+              <i className="fas fa-calendar-times" style={{ fontSize: '48px', marginBottom: '20px', color: '#ccc' }}></i>
+              <p>No sessions found for {currentMonth}.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

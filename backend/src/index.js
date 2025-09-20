@@ -1,6 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import studentsRoutes from "./routes/students.route.js";
 import dotenv from "dotenv";
 import { db } from "./lib/db.js";
 import cookieParser from "cookie-parser";
@@ -28,6 +29,7 @@ app.use(cors(corsOptions));
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/students", studentsRoutes);
 
 const PORT = process.env.PORT || 3000;
 

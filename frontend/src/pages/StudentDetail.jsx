@@ -1,81 +1,268 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Grid3X3, Trophy, Mail, Calendar, Bell, History, LogOut } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import axiosInstance from '../lib/axios';
 
 const StudentDetail = () => {
-  const [sessions] = useState([
-    {
-      id: 1,
-      month: 'MAY',
-      day: '03',
-      title: 'First Session',
-      campus: 'Campus',
-      status: 'resolved'
-    },
-    {
-      id: 2,
-      month: 'MAY',
-      day: '15',
-      title: 'Second Session',
-      campus: 'Campus',
-      status: 'cancelled'
+  const {authUser, logout} = useAuthStore();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  const [studentData, setStudentData] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch student data
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(`/students/${id}`);
+        setStudentData(response.data);
+      } catch (error) {
+        console.error('Error fetching student data:', error);
+        setError('Student not found or access denied');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchStudentData();
     }
-  ]);
+  }, [id]);
 
-  // Mock data - replace with actual data from props or API
-  const studentData = {
-    name: 'Student',
-    program: 'Program',
-    studentNumber: 'Student Number',
-    gender: 'Gender',
-    profileImage: '/user-stud.png'
-  };
+  // Fetch student sessions
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const response = await axiosInstance.get(`/students/${id}/sessions`);
+        setSessions(response.data);
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+        // Don't set error for sessions, just leave empty array
+      }
+    };
 
-  const sessionData = {
-    mood: 'Happy',
-    moodIcon: '/happiness.png'
+    if (id) {
+      fetchSessions();
+    }
+  }, [id]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <div className="sidebar">
+          <div className="logo">
+            <img src="/logo-counsel.png" alt="TSU Logo" />
+          </div>
+          <ul className="nav-links">
+            <li>
+              <Link to="/">
+                <Grid3X3 size={20} />
+                Dashboard
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/student-profiles">
+                <Trophy size={20} />
+                Student Profiles
+              </Link>
+            </li>
+            <li>
+              <Link to="/messages">
+                <Mail size={20} />
+                Messages
+              </Link>
+            </li>
+            <li>
+              <Link to="/calendar">
+                <Calendar size={20} />
+                Calendar
+              </Link>
+            </li>
+            <li>
+              <Link to="/notifications">
+                <Bell size={20} />
+                Notifications
+              </Link>
+            </li>
+            <li>
+              <Link to="/session-history">
+                <History size={20} />
+                Session History
+              </Link>
+            </li>
+            <li className="sign-out">
+              {authUser && (
+                <Link 
+                  to="/login" 
+                  className="text-white hover:text-red-200 transition-colors duration-200" 
+                  onClick={logout}
+                >
+                  <LogOut size={20} />
+                  Logout
+                </Link>
+              )}
+            </li>
+          </ul>
+        </div>
+        <div className="main-content" style={{ flex: 1, padding: '30px', backgroundColor: 'rgb(255, 255, 255)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '18px', color: '#666' }}>Loading student details...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <div className="sidebar">
+          <div className="logo">
+            <img src="/logo-counsel.png" alt="TSU Logo" />
+          </div>
+          <ul className="nav-links">
+            <li>
+              <Link to="/">
+                <Grid3X3 size={20} />
+                Dashboard
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/student-profiles">
+                <Trophy size={20} />
+                Student Profiles
+              </Link>
+            </li>
+            <li>
+              <Link to="/messages">
+                <Mail size={20} />
+                Messages
+              </Link>
+            </li>
+            <li>
+              <Link to="/calendar">
+                <Calendar size={20} />
+                Calendar
+              </Link>
+            </li>
+            <li>
+              <Link to="/notifications">
+                <Bell size={20} />
+                Notifications
+              </Link>
+            </li>
+            <li>
+              <Link to="/session-history">
+                <History size={20} />
+                Session History
+              </Link>
+            </li>
+            <li className="sign-out">
+              {authUser && (
+                <Link 
+                  to="/login" 
+                  className="text-white hover:text-red-200 transition-colors duration-200" 
+                  onClick={logout}
+                >
+                  <LogOut size={20} />
+                  Logout
+                </Link>
+              )}
+            </li>
+          </ul>
+        </div>
+        <div className="main-content" style={{ flex: 1, padding: '30px', backgroundColor: 'rgb(255, 255, 255)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '18px', color: '#dc3545', marginBottom: '20px' }}>{error}</div>
+            <button 
+              onClick={() => navigate('/student-profiles')}
+              style={{ 
+                backgroundColor: '#6a040f', 
+                color: 'white', 
+                border: 'none', 
+                padding: '10px 20px', 
+                borderRadius: '5px', 
+                cursor: 'pointer' 
+              }}
+            >
+              Back to Student Profiles
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+    const day = date.getDate().toString().padStart(2, '0');
+    return { month, day };
   };
 
   return (
-    <div className="container" style={{ display: 'flex', width: '100%', height: '100vh' }}>
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="sidebar" style={{ width: '220px', backgroundColor: '#6a040f', color: 'white', padding: '20px 0', height: '100%' }}>
-        <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px', marginBottom: '30px' }}>
-          <img src="/logo.png" alt="TSU Logo" style={{ width: '80px', height: 'auto', display: 'block', margin: '0 auto' }} />
+      <div className="sidebar">
+        <div className="logo">
+          <img src="/logo-counsel.png" alt="TSU Logo" />
         </div>
-        <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
-            </a>
+        <ul className="nav-links">
+          <li>
+            <Link to="/">
+              <Grid3X3 size={20} />
+              Dashboard
+            </Link>
           </li>
-          <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <a href="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
-            </a>
+          <li className="active">
+            <Link to="/student-profiles">
+              <Trophy size={20} />
+              Student Profiles
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
-            </a>
+          <li>
+            <Link to="/messages">
+              <Mail size={20} />
+              Messages
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
-            </a>
+          <li>
+            <Link to="/calendar">
+              <Calendar size={20} />
+              Calendar
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
-            </a>
+          <li>
+            <Link to="/notifications">
+              <Bell size={20} />
+              Notifications
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
-            </a>
+          <li>
+            <Link to="/session-history">
+              <History size={20} />
+              Session History
+            </Link>
           </li>
-          <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <a href="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
-            </a>
+          <li className="sign-out">
+            {authUser && (
+              <Link 
+                to="/login" 
+                className="text-white hover:text-red-200 transition-colors duration-200" 
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                Logout
+              </Link>
+            )}
           </li>
         </ul>
       </div>
@@ -84,27 +271,44 @@ const StudentDetail = () => {
       <div className="main-content" style={{ flex: 1, padding: '30px', backgroundColor: 'rgb(255, 255, 255)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)', borderRadius: '20px' }}>
         {/* Back Button */}
         <div className="back-button" style={{ marginBottom: '20px' }}>
-          <a href="/student-profiles" style={{ color: '#666', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <button 
+            onClick={() => navigate('/student-profiles')}
+            style={{ color: '#666', textDecoration: 'none', display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
             <i className="fas fa-arrow-left" style={{ marginRight: '5px' }}></i>
-          </a>
+            Back to Student Profiles
+          </button>
         </div>
 
         {/* Student Info and Mood Section */}
         <div className="student-detail-container" style={{ display: 'flex', gap: '30px', marginBottom: '40px', marginTop: '20px' }}>
           <div className="student-info-card" style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '10px', flex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <img src={studentData.profileImage} alt="Student Profile" className="student-profile-img" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
+            <img src={studentData?.profileImage || '/user-stud.png'} alt="Student Profile" className="student-profile-img" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }} />
             <div className="student-info">
-              <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: '#333' }}>{studentData.name}</h2>
-              <p style={{ margin: '5px 0', color: '#666' }}>{studentData.program}</p>
-              <p style={{ margin: '5px 0', color: '#666' }}>{studentData.studentNumber}</p>
-              <p style={{ margin: '5px 0', color: '#666' }}>{studentData.gender}</p>
+              <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: '#333' }}>{studentData?.name || 'Unknown Student'}</h2>
+              <p style={{ margin: '5px 0', color: '#666' }}>Program: {studentData?.program || 'N/A'}</p>
+              <p style={{ margin: '5px 0', color: '#666' }}>Student No: {studentData?.studentNo || 'N/A'}</p>
+              <p style={{ margin: '5px 0', color: '#666' }}>Gender: {studentData?.gender || 'N/A'}</p>
+              <p style={{ margin: '5px 0', color: '#666' }}>College: {studentData?.college || 'N/A'}</p>
             </div>
           </div>
 
           <div className="mood-card" style={{ backgroundColor: '#e3f2fd', padding: '20px', borderRadius: '10px', textAlign: 'center', minWidth: '200px' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>Mood for today</h3>
-            <img src={sessionData.moodIcon} alt="Happy Mood" className="mood-emoji" style={{ width: '40px', height: '40px', marginBottom: '15px' }} />
-            <button className="mood-log-btn" style={{ backgroundColor: '#6a040f', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>
+            <img src="/happiness.png" alt="Happy Mood" className="mood-emoji" style={{ width: '40px', height: '40px', marginBottom: '15px' }} />
+            <button 
+              className="mood-log-btn" 
+              style={{ 
+                backgroundColor: '#6a040f', 
+                color: 'white', 
+                border: 'none', 
+                padding: '10px 20px', 
+                borderRadius: '5px', 
+                cursor: 'pointer',
+                opacity: 0.6
+              }}
+              disabled
+            >
               View Mood Log
             </button>
           </div>
@@ -112,17 +316,24 @@ const StudentDetail = () => {
 
         {/* Sessions Section */}
         <div className="sessions-section" style={{ marginTop: '30px' }}>
-          <h2 style={{ margin: '0 0 20px 0', fontSize: '24px', color: '#333' }}>Session</h2>
+          <h2 style={{ margin: '0 0 20px 0', fontSize: '24px', color: '#333' }}>Session History</h2>
           <div className="session-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {sessions.map((session) => (
-              <div key={session.id} className="session-card" style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '10px', gap: '20px' }}>
+            {sessions.length > 0 ? (
+              sessions.map((session) => {
+                const { month, day } = formatDate(session.sessionDate);
+                return (
+                  <div key={session.sessionID} className="session-card" style={{ display: 'flex', alignItems: 'center', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '10px', gap: '20px' }}>
                 <div className="session-date" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
-                  <span className="month" style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>{session.month}</span>
-                  <span className="day" style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>{session.day}</span>
+                      <span className="month" style={{ fontSize: '12px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase' }}>{month}</span>
+                      <span className="day" style={{ fontSize: '24px', fontWeight: 'bold', color: '#333' }}>{day}</span>
                 </div>
                 <div className="session-details" style={{ flex: 1 }}>
-                  <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: '#333' }}>{session.title}</h3>
-                  <p style={{ margin: '5px 0', color: '#666' }}>{session.campus}</p>
+                      <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: '#333' }}>Session #{session.sessionID}</h3>
+                      <p style={{ margin: '5px 0', color: '#666' }}>Campus: {session.campus || 'N/A'}</p>
+                      <p style={{ margin: '5px 0', color: '#666' }}>Time: {session.sessionTime || 'N/A'}</p>
+                      {session.sessionNotes && (
+                        <p style={{ margin: '5px 0', color: '#666', fontSize: '14px' }}>Notes: {session.sessionNotes}</p>
+                      )}
                   <p className={`session-status ${session.status}`} style={{ 
                     margin: '5px 0 0 0', 
                     padding: '4px 8px', 
@@ -130,19 +341,21 @@ const StudentDetail = () => {
                     fontSize: '12px', 
                     fontWeight: 'bold',
                     display: 'inline-block',
-                    backgroundColor: session.status === 'resolved' ? '#d4edda' : '#f8d7da',
-                    color: session.status === 'resolved' ? '#155724' : '#721c24'
+                        backgroundColor: session.status === 'Resolved' ? '#d4edda' : '#f8d7da',
+                        color: session.status === 'Resolved' ? '#155724' : '#721c24'
                   }}>
-                    {session.status === 'resolved' ? 'Resolved' : 'Cancelled'}
+                        {session.status || 'Unknown'}
                   </p>
                 </div>
-                <div className="session-link">
-                  <a href="/session-detail" style={{ color: '#666', textDecoration: 'none' }}>
-                    <i className="fas fa-external-link-alt"></i>
-                  </a>
                 </div>
+                );
+              })
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                <i className="fas fa-calendar-times" style={{ fontSize: '48px', marginBottom: '20px', color: '#ccc' }}></i>
+                <p>No sessions found for this student.</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

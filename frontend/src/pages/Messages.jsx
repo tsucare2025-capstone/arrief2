@@ -4,13 +4,18 @@ import NoChatSelected from '../components/NoChatSelected'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/useAuthStore'
 import { Link } from 'react-router-dom'
-import { Grid3X3, Trophy, Mail, Calendar, Bell, History, LogOut } from 'lucide-react'
+import { Grid3X3, Trophy, Mail, CalendarIcon, Bell, History, LogOut } from 'lucide-react'
 import { useState } from 'react'
-
+import CalendarPage from './Calendar'
+import Notifications from './Notifications'
+import SessionHistory from './SessionHistory'
+import StudentProfiles from './StudentProfiles'
+import StudentDetail from './StudentDetail'
+import SessionDetail from './SessionDetail'
 
 const Messages = () => {
     const {selectedUser} = useChatStore();
-    const {logout} = useAuthStore();
+    const {authUser, logout} = useAuthStore();
     
     return (
         <div className="messages-page-container">
@@ -41,7 +46,7 @@ const Messages = () => {
           </li>
           <li>
             <Link to="/calendar">
-              <Calendar size={20} />
+              <CalendarIcon size={20} />
               Calendar
             </Link>
           </li>
@@ -58,10 +63,16 @@ const Messages = () => {
             </Link>
           </li>
           <li className="sign-out">
-            <Link to="/login" onClick={logout}>
-              <LogOut size={20} />
-              Sign out
-            </Link>
+            {authUser && (
+              <Link 
+                to="/login" 
+                className="text-white hover:text-red-200 transition-colors duration-200" 
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                Logout
+              </Link>
+            )}
           </li>
         </ul>
       </div>

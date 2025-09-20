@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Grid3X3, Trophy, Mail, CalendarIcon, Bell, History, LogOut } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import Messages from './Messages'
+import CalendarPage from './Calendar'
+import Notifications from './Notifications'
+import SessionHistory from './SessionHistory'
+import StudentProfiles from './StudentProfiles'
+import StudentDetail from './StudentDetail'
+
 
 const SessionDetail = () => {
   const [notes, setNotes] = useState('');
   const [feedback, setFeedback] = useState('');
+  const {authUser, logout} = useAuthStore();
 
   // Mock data - replace with actual data from props or API
   const studentData = {
@@ -22,47 +33,60 @@ const SessionDetail = () => {
   };
 
   return (
-    <div className="container" style={{ display: 'flex', width: '100%', height: '100vh' }}>
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <div className="sidebar" style={{ width: '220px', backgroundColor: '#6a040f', color: 'white', padding: '20px 0', height: '100%' }}>
-        <div className="logo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px', marginBottom: '30px' }}>
-          <img src="/logo.png" alt="TSU Logo" style={{ width: '80px', height: 'auto', display: 'block', margin: '0 auto' }} />
+      <div className="sidebar">
+        <div className="logo">
+          <img src="/logo-counsel.png" alt="TSU Logo" />
         </div>
-        <ul className="nav-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-th-large" style={{ marginRight: '10px' }}></i>Dashboard
-            </a>
+        <ul className="nav-links">
+          <li>
+            <Link to="/">
+              <Grid3X3 size={20} />
+              Dashboard
+            </Link>
           </li>
-          <li className="active" style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <a href="/student-profiles" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-user-graduate" style={{ marginRight: '10px' }}></i>Student Profiles
-            </a>
+          <li>
+            <Link to="/student-profiles">
+              <Trophy size={20} />
+              Student Profiles
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/messages" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-envelope" style={{ marginRight: '10px' }}></i>Messages
-            </a>
+          <li>
+            <Link to="/messages">
+              <Mail size={20} />
+              Messages
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/calendar" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-calendar" style={{ marginRight: '10px' }}></i>Calendar
-            </a>
+          <li className="active">
+            <Link to="/calendar">
+              <CalendarIcon size={20} />
+              Calendar
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/notifications" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-bell" style={{ marginRight: '10px' }}></i>Notifications
-            </a>
+          <li>
+            <Link to="/notifications">
+              <Bell size={20} />
+              Notifications
+            </Link>
           </li>
-          <li style={{ marginBottom: '10px' }}>
-            <a href="/session-history" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-history" style={{ marginRight: '10px' }}></i>Session History
-            </a>
+          <li>
+            <Link to="/session-history">
+              <History size={20} />
+              Session History
+            </Link>
           </li>
-          <li className="sign-out" style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <a href="/login" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>Sign out
-            </a>
+          <li className="sign-out">
+            {authUser && (
+              <Link 
+                to="/login" 
+                className="text-white hover:text-red-200 transition-colors duration-200" 
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                Logout
+              </Link>
+            )}
           </li>
         </ul>
       </div>
