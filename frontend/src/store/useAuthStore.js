@@ -11,6 +11,8 @@ export const useAuthStore = create((set, get) => ({
     isCheckAuth: false,
     isSignedUp: false,
     isLoggedIn: false,
+    isVerifyingOTP: false,
+    pendingVerification: null, // Stores counselor data when OTP verification is needed
     onlineUsers: [],
     socket: null,
     
@@ -67,6 +69,16 @@ export const useAuthStore = create((set, get) => ({
         try {
             const response = await axiosInstance.post("/auth/login", data);
             
+            // Check if OTP verification is needed
+            if (!response.data.is_verified) {
+                set({ 
+                    pendingVerification: response.data,
+                    isLoggedIn: false 
+                });
+                toast.success(response.data.message || "OTP sent to your email");
+                return;
+            }
+            
             // Store token in localStorage as fallback
             if (response.data.token) {
                 localStorage.setItem('authToken', response.data.token);
@@ -81,6 +93,46 @@ export const useAuthStore = create((set, get) => ({
         } finally {
             set({ isLoggedIn: false });
         }
+    },
+
+    verifyOTP: async (counselorId, otp) => {
+        set({ isVerifyingOTP: true });
+        try {
+            const response = await axiosInstance.post("/auth/verify-otp", {
+                counselorId,
+                otp
+            });
+            
+            // Store token in localStorage as fallback
+            if (response.data.token) {
+                localStorage.setItem('authToken', response.data.token);
+            }
+            
+            set({ 
+                authUser: response.data,
+                pendingVerification: null 
+            });
+            toast.success(response.data.message || "Account verified successfully!");
+            
+            get().connectSocket();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "OTP verification failed");
+        } finally {
+            set({ isVerifyingOTP: false });
+        }
+    },
+
+    resendOTP: async (counselorId) => {
+        try {
+            await axiosInstance.post("/auth/resend-otp", { counselorId });
+            toast.success("OTP resent successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to resend OTP");
+        }
+    },
+
+    clearPendingVerification: () => {
+        set({ pendingVerification: null });
     },
 
     logout: async () => {

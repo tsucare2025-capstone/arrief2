@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { Eye, EyeOff, Loader } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import OTPVerification from '../components/OTPVerification'
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -9,13 +10,37 @@ const LoginPage = () => {
     email: '',
     password: ''
   })
-  const {login, isLoggedIn} = useAuthStore()
+  const {login, isLoggedIn, pendingVerification, verifyOTP, resendOTP, clearPendingVerification} = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     await login(formData)
   }
-      // Navigation will happen automatically when authUser is set
+
+  const handleOTPVerification = async (counselorId, otp) => {
+    await verifyOTP(counselorId, otp)
+  }
+
+  const handleResendOTP = async (counselorId) => {
+    await resendOTP(counselorId)
+  }
+
+  const handleBackToLogin = () => {
+    clearPendingVerification()
+  }
+
+  // Show OTP verification if pending
+  if (pendingVerification) {
+    return (
+      <OTPVerification
+        counselorData={pendingVerification}
+        onBack={handleBackToLogin}
+        onSuccess={() => {
+          // Navigation will happen automatically when authUser is set
+        }}
+      />
+    )
+  }
     
 
   return (
